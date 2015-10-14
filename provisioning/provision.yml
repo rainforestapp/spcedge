@@ -1,0 +1,47 @@
+---
+- hosts: all
+
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: ensure system packages are up to date
+      apt: upgrade=dist
+      sudo: yes
+
+    - name: install required system packages
+      apt: pkg={{ item }} state=latest
+      with_items:
+         - "{{ system_packages }}"
+      sudo: yes
+
+    - name: download python 2.7.10
+      get_url: url=https://www.python.org/ftp/python/2.7.10/Python-2.7.10.tgz dest=/home/vagrant/Python-2.7.10.tgz
+
+    - name: unpack python source
+      unarchive: src=/home/vagrant/Python-2.7.10.tgz dest=/home/vagrant/ copy=no creates=/home/vagrant/Python-2.7.10
+
+    - name: build and install new python
+      shell: "{{ item }}"
+      args:
+        chdir: /home/vagrant/Python-2.7.10
+        creates: /usr/local/bin/python2.7
+      with_items:
+        - ./configure --with-ensurepip=install
+        - make altinstall
+      sudo: yes
+
+    - name: make new-python's pip the default
+      file: path=/usr/local/bin/pip src=/usr/local/bin/pip2.7 state=link force=yes
+      sudo: yes
+
+    - name: install basic python packages
+      pip: name={{ item }} state=latest
+      with_items:
+        - "{{ basic_python_packages }}"
+      sudo: yes
+
+    - name: install scientific-stack python packages
+      pip: name={{ item }} state=latest virtualenv={{ virtualenv_path }}
+      with_items:
+        - "{{ sci_python_packages }}"

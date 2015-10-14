@@ -1,0 +1,23 @@
+system_packages:
+  - build-essential
+  - gfortran
+  - libblas-dev
+  - liblapack-dev
+  - libssl-dev
+  - openssl
+  - libpq-dev
+
+basic_python_packages:
+  - pip
+  - setuptools
+  - virtualenv
+  - cython
+
+sci_python_packages:
+  - numpy
+  - scipy
+  - scikit-learn
+  - pandas
+  - psycopg2
+
+virtualenv_path: /home/vagrant/forscience
